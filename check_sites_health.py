@@ -1,29 +1,35 @@
 import sys
-import re
 import os
 import requests
+import validators
+import whois
+import datetime
 
 
 def load_urls4check(filepath):
     with open(filepath, 'r') as file:
-        url_list = [(url.strip()).lower() for url in file]
-   print(url_list)
-
-def validate_urls(urls):
-    url_list = []
-    for url in urls:
-        url_list.append(url)
-    print(url_list)
+        url_list = [(url.strip()).lower()
+                    for url in file if validators.url(url)]
+    return url_list
 
 def is_server_respond_with_200(url):
-        request = requests.get(url)
-        print(request.status_code)
+    request = requests.get(url)
+    return request.status_code
+
 
 def get_domain_expiration_date(url):
-    print('not expired')
+    whois_data = whois.whois(url)
+    whois_expiration = whois_data.expiration_date
+    if type(whois_expiration) is list:
+        expiration_date = whois_expiration[0]
+    else: 
+        expiration_date = whois_expiration
+    return expiration_date
 
 def print_domain_status(url):
-    print('Site: %s Active: %s Expired: %s'%(url,is_server_respond_with_200(url),get_domain_expiration_date(url)))
+    print('URL:%s | Status:%s | Expired in:%s '%
+          (url, is_server_respond_with_200(url), get_domain_expiration_date(url) - datetime.datetime.now()))
+
 
 if __name__ == '__main__':
     if not len(sys.argv) > 1:
@@ -32,34 +38,7 @@ if __name__ == '__main__':
     filename = sys.argv[1]
     if (bool(filename)) and (os.path.isfile(filename)):
         urls4check = load_urls4check(filename)
-        url_list = validate_urls(urls4check)
-        for url in url_list:
+        for url in urls4check:
             print_domain_status(url)
     else:
         print("Error! File doesn't exist!")
-
-'''
-  
-        request = requests.get(url)
-        ConnectionError('Error') 
-        print(request.status_code)
-
-def get_domain_expiration_date(domain_name):
-    pass
-    return True
-
-def print_domain_status(domain_info):
-    for url in urls_list:
-        
-    
-
-    is_server_respond_with_200('http://ytttttta.ru')
-
-    
-    
-    
-        urls_list = load_urls4check(filename)
-        is_server_respond_with_200(url)
-        get_domain_expiration_date(domain_name)
-
-'''
