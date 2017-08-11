@@ -13,22 +13,27 @@ def load_urls4check(filepath):
     return url_list
 
 def is_server_respond_with_200(url):
-    request = requests.get(url)
-    return request.status_code
-
+    try:
+        request = requests.get(url)
+        status_code = request.status_code
+    except requests.exceptions.RequestException:
+        status_code = 'Error'
+    return status_code
 
 def get_domain_expiration_date(url):
-    whois_data = whois.whois(url)
-    whois_expiration = whois_data.expiration_date
-    if type(whois_expiration) is list:
-        expiration_date = whois_expiration[0]
-    else: 
-        expiration_date = whois_expiration
+    if is_server_respond_with_200(url) == 'Error':
+        expiration_date = 'N/A'
+    else:    
+        whois_data = whois.whois(url)
+        whois_expiration = whois_data.expiration_date
+        if type(whois_expiration) is list:
+            expiration_date = whois_expiration[0] - datetime.datetime.now()
+        else:
+            expiration_date = whois_expiration - datetime.datetime.now()
     return expiration_date
 
 def print_domain_status(url):
-    print('URL:%s | Status:%s | Expired in:%s '%
-          (url, is_server_respond_with_200(url), get_domain_expiration_date(url) - datetime.datetime.now()))
+    print('URL:%s | Status:%s | Expired in:%s '%(url, is_server_respond_with_200(url), get_domain_expiration_date(url)))
 
 
 if __name__ == '__main__':
