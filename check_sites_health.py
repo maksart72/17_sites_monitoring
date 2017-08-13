@@ -17,12 +17,12 @@ def is_server_respond_with_200(url):
         request = requests.get(url)
         status_code = request.status_code
     except requests.exceptions.RequestException:
-        status_code = 'Error'
+        status_code = None
     return status_code
 
 def get_domain_expiration_date(url):
-    if is_server_respond_with_200(url) == 'Error':
-        expiration_date = 'N/A'
+    if is_server_respond_with_200(url) is None:
+        expiration_date = None
     else:    
         whois_data = whois.whois(url)
         whois_expiration = whois_data.expiration_date
