@@ -43,7 +43,10 @@ if __name__ == '__main__':
     filename = sys.argv[1]
     if (bool(filename)) and (os.path.isfile(filename)):
         urls4check = load_urls4check(filename)
-        for url in urls4check:
-            print_domain_status(url)
+        if len(urls4check) >= 1:
+            for url in urls4check:
+                print_domain_status(url)
+        else:
+            print('Error: File doesn\'t contains correct URL')
     else:
-        print("Error! File doesn't exist!")
+        print("Error: File doesn't exist!")
